@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Programmable browser playground for multi-robot consensus, formation control, graphs, and noisy sensing.">
+<title>Programmable Multi-Robot Control Lab</title>
+<style>
+:root{--bg:#09111f;--panel:#111b2e;--panel2:#17243d;--text:#eef4ff;--muted:#9eacc7;--line:#2b3a59;--accent:#77a9ff;--accent2:#8ce2c0;--warn:#ffd274;--danger:#ff8585;--ok:#93e6a9}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07101d,#0b1323 42%,#09111f);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.42}
+button,input,select,textarea{font:inherit}.shell{max-width:1600px;margin:auto;padding:18px}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center;padding:18px 0}.eyebrow{font-size:.76rem;text-transform:uppercase;letter-spacing:.13em;color:var(--accent2);font-weight:800}.hero h1{font-size:clamp(2rem,4vw,4rem);line-height:1.03;margin:.35rem 0 .7rem}.hero p{color:var(--muted);max-width:850px}.card,.panel,.codePanel,.chartCard{background:rgba(17,27,46,.96);border:1px solid var(--line);border-radius:16px}.heroCard{padding:16px}.equation{font-family:Georgia,serif;background:#0a1425;border:1px solid var(--line);padding:12px;border-radius:10px;overflow:auto}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:8px 12px;cursor:pointer}.tab.active{background:var(--accent);color:#07101d;border-color:transparent;font-weight:800}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;align-items:start}.canvasCard{padding:12px}.toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:10px}.groupBtns{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 12px;border-radius:9px;cursor:pointer;min-height:40px}.btn.primary{background:var(--accent);color:#06101e;border-color:transparent;font-weight:800}.btn.warn{background:var(--warn);color:#151515;border-color:transparent;font-weight:800}.btn.danger{background:var(--danger);color:#1d0b0b;border-color:transparent}.btn:disabled{opacity:.5;cursor:not-allowed}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:radial-gradient(circle at 50% 45%,#172644,#0a1426 65%,#07101d);border:1px solid #263753;border-radius:12px;touch-action:none}.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.8rem;padding-top:8px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--accent)}.dot.des{background:var(--accent2)}.dot.lead{background:var(--warn)}.dot.sensor{background:#d7a4ff}
+.sidebar{display:grid;gap:12px}.panel{padding:13px}.panel h2,.codePanel h2,.chartCard h2{font-size:1rem;margin:0 0 10px}.field{display:grid;gap:6px;margin:10px 0}.field label{font-size:.8rem;color:var(--muted);font-weight:700}.row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.value{font-variant-numeric:tabular-nums;color:var(--accent2);min-width:55px;text-align:right}.select,.num,.text{width:100%;background:#091426;color:var(--text);border:1px solid var(--line);padding:8px 9px;border-radius:8px}.toggle{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:5px 0;color:var(--muted);font-size:.85rem}.toggle input{width:18px;height:18px}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.metric{padding:8px;background:#091426;border:1px solid var(--line);border-radius:9px}.metric b{display:block}.metric span{font-size:.72rem;color:var(--muted)}
+.workspace{display:none;margin-top:16px}.workspace.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.codePanel{padding:13px}.code{width:100%;min-height:390px;resize:vertical;background:#07101c;color:#eaf2ff;border:1px solid var(--line);border-radius:10px;padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:4}.smallcode{min-height:210px}.statusBox{background:#091426;border:1px solid var(--line);border-radius:9px;padding:9px;color:var(--muted);font:12px/1.45 ui-monospace,monospace;white-space:pre-wrap;max-height:160px;overflow:auto}.help{font-size:.82rem;color:var(--muted)}.presetBtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.matrixWrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.matrix{border-collapse:collapse;min-width:100%;background:#091426}.matrix td,.matrix th{border:1px solid #253653;padding:5px;text-align:center;font-size:.75rem}.matrix input{width:42px;background:#101d33;color:var(--text);border:1px solid #314466;border-radius:5px;text-align:center;padding:4px}
+.sensorTable{width:100%;border-collapse:collapse}.sensorTable th,.sensorTable td{border-bottom:1px solid var(--line);padding:7px 5px;text-align:left;font-size:.78rem}.sensorTable input,.sensorTable select{background:#091426;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px;max-width:100px}.sensorTable input[type=checkbox]{width:17px;height:17px}.sensorExplain{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}.sensorExplain div{background:#091426;border:1px solid var(--line);padding:9px;border-radius:9px}.sensorExplain b{font-size:.82rem}.sensorExplain p{font-size:.75rem;color:var(--muted);margin:.35rem 0 0}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartCard{padding:12px}.chartCard canvas{aspect-ratio:2.8/1;background:#091426}.footer{text-align:center;color:var(--muted);font-size:.8rem;padding:22px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:700px){.shell{padding:10px}.sidebar{grid-template-columns:1fr}.charts{grid-template-columns:1fr}.sensorExplain{grid-template-columns:1fr}.toolbar{align-items:stretch}.groupBtns{width:100%}.btn{flex:1}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="hero">
+  <div><div class="eyebrow">Programmable multi-agent systems lab</div><h1>Consensus, Formation, Graphs & Sensing — all editable</h1>
+  <p>Build a robot team, edit its communication graph, configure noisy sensors, modify controller parameters, and write the distributed protocol itself in Python directly in the browser.</p></div>
+  <div class="card heroCard"><div class="eyebrow">Default relative-state law</div><div class="equation">uᵢ = -k Σⱼ aᵢⱼ [(pᵢ-pⱼ) - (dᵢ-dⱼ)]</div><p class="help">The Python editor receives per-robot sensor observations rather than privileged global truth. This makes sensing assumptions explicit.</p></div>
+</header>
+
+<nav class="tabs" aria-label="Workspace tabs">
+<button class="tab active" data-tab="lab">Simulation</button><button class="tab" data-tab="protocol">Protocol editor</button><button class="tab" data-tab="graph">Graph editor</button><button class="tab" data-tab="sensors">Sensor lab</button><button class="tab" data-tab="safety">Safety / CBF</button><button class="tab" data-tab="scenario">Scenario I/O</button>
+</nav>
+
+<section class="workspace active" id="lab">
+<div class="layout">
+  <section class="card canvasCard">
+    <div class="toolbar"><div class="groupBtns"><button class="btn primary" id="playBtn">▶ Run</button><button class="btn" id="stepBtn">Step</button><button class="btn" id="resetBtn">Reset</button><button class="btn warn" id="disturbBtn">⚡ Disturb</button></div><div class="help" id="simStatus">Paused</div></div>
+    <canvas id="sim" width="1200" height="675" tabindex="0"></canvas>
+    <div class="legend"><span><i class="dot"></i>robot</span><span><i class="dot des"></i>desired point</span><span><i class="dot lead"></i>leader</span><span><i class="dot sensor"></i>sensor ray</span><span><i class="dot" style="background:#ff8585"></i>active CBF</span></div>
+  </section>
+  <aside class="sidebar">
+    <section class="panel"><h2>Team & dynamics</h2>
+      <div class="field"><label>Robots</label><div class="row"><input id="count" type="range" min="3" max="15" value="6"><span class="value" id="countVal">6</span></div></div>
+      <div class="field"><label>Dynamics</label><select class="select" id="dynamics"><option value="single">Single integrator</option><option value="double">Double integrator</option></select></div>
+      <div class="field"><label>Formation</label><select class="select" id="formation"><option value="circle">Circle</option><option value="line">Line</option><option value="v">V</option><option value="grid">Grid</option><option value="custom">Custom</option></select></div>
+      <div class="field"><label>Max speed</label><div class="row"><input id="maxSpeed" type="range" min="20" max="220" step="5" value="100"><span class="value" id="maxSpeedVal">100</span></div></div>
+      <div class="field"><label>Control/update rate</label><div class="row"><input id="rate" type="range" min="5" max="60" step="5" value="30"><span class="value" id="rateVal">30 Hz</span></div></div>
+    </section>
+    <section class="panel"><h2>Protocol parameters</h2>
+      <div class="field"><label>k_position</label><input class="num" id="kp" type="number" value="1.2" step="0.1"></div>
+      <div class="field"><label>k_velocity</label><input class="num" id="kv" type="number" value="0.8" step="0.1"></div>
+      <div class="field"><label>desired spacing</label><input class="num" id="spacing" type="number" value="70" step="5"></div>
+      <div class="field"><label>Custom JSON parameters</label><input class="text" id="customParams" value='{"leader_gain":1.0,"avoid_gain":1.8}'></div>
+      <div class="toggle"><label>Use Python protocol</label><input id="usePython" type="checkbox"></div>
+    </section>
+    <section class="panel"><h2>Visualization</h2>
+      <div class="toggle"><label>Graph edges</label><input id="showGraph" type="checkbox" checked></div>
+      <div class="toggle"><label>Trails</label><input id="showTrails" type="checkbox" checked></div>
+      <div class="toggle"><label>Sensor rays</label><input id="showSensors" type="checkbox"></div>
+      <div class="toggle"><label>Desired geometry</label><input id="showDesired" type="checkbox" checked></div>
+    </section>
+    <section class="panel"><h2>Live metrics</h2><div class="metrics">
+      <div class="metric"><b id="spread">0</b><span>team spread</span></div><div class="metric"><b id="ferr">0</b><span>formation RMS</span></div><div class="metric"><b id="edgeCount">0</b><span>links</span></div><div class="metric"><b id="sensorCount">0</b><span>measurements/step</span></div>
+    </div></section>
+  </aside>
+</div>
+<div class="charts"><div class="chartCard"><h2>Error history</h2><canvas id="errChart"></canvas></div><div class="chartCard"><h2>Robot x positions</h2><canvas id="stateChart"></canvas></div></div>
+</section>
+
+<section class="workspace" id="protocol">
+<div class="grid2">
+  <section class="codePanel"><h2>Python protocol</h2>
+    <div class="presetBtns"><button class="btn" data-preset="consensus">Consensus</button><button class="btn" data-preset="formation">Formation</button><button class="btn" data-preset="leader">Leader–follower</button><button class="btn" data-preset="sensor">Sensor-aware</button></div>
+    <textarea id="pythonCode" class="code" spellcheck="false"></textarea>
+    <div class="groupBtns" style="margin-top:8px"><button class="btn primary" id="loadPython">Load / compile Python</button><button class="btn" id="testPython">Test one step</button></div>
+    <p class="help">Python runs locally in the browser through Pyodide. The first load downloads the Python runtime from a CDN. No server executes student code.</p>
+  </section>
+  <section class="codePanel"><h2>Protocol API</h2>
+    <div class="statusBox" id="pyStatus">Python runtime not loaded.</div>
+    <h3 style="font-size:.9rem">Required function</h3>
+    <div class="statusBox">def control(robot_id, observations, params):
+    # return [ux, uy]
+    return [0.0, 0.0]</div>
+    <p class="help"><b>observations</b> is a JSON-compatible dict with the robot's own noisy measurements and a list of neighbor observations. Available fields depend on enabled sensors.</p>
+    <h3 style="font-size:.9rem">Runtime parameter map</h3>
+<p class="help">Create arbitrary protocol parameters without changing simulator code. These values are merged into the Python <code>params</code> dictionary.</p>
+<div class="matrixWrap"><table class="sensorTable" id="paramTable"><thead><tr><th>Name</th><th>Type</th><th>Value</th><th></th></tr></thead><tbody></tbody></table></div>
+<div class="groupBtns" style="margin-top:8px"><button class="btn" id="addParam">+ parameter</button><button class="btn" id="resetParams">Reset parameters</button></div>
+<h3 style="font-size:.9rem">Observation schema</h3>
+    <div class="statusBox">{
+  "self": {"id":0, "position":[x,y], "velocity":[vx,vy]},
+  "neighbors": [
+    {"id":1, "distance":..., "bearing":..., "relative_position":[dx,dy],
+     "rf_rssi":..., "radar":{"range":...,"bearing":...}}
+  ],
+  "desired_offset":[dx,dy],
+  "leader": true/false,
+  "dt": 0.0333
+}</div>
+  </section>
+</div>
+</section>
+
+<section class="workspace" id="graph">
+<div class="grid2">
+<section class="codePanel"><h2>Graph structure</h2>
+  <div class="field"><label>Quick topology</label><select class="select" id="topology"><option value="complete">Complete</option><option value="ring">Ring</option><option value="line">Path</option><option value="star">Star</option><option value="radius">Distance limited</option><option value="custom">Custom matrix</option><option value="python">Python-defined dynamic graph</option></select></div>
+  <div class="field"><label>Communication radius</label><div class="row"><input id="commRadius" type="range" min="60" max="600" step="10" value="270"><span class="value" id="commRadiusVal">270</span></div></div>
+  <div class="toggle"><label>Directed graph</label><input id="directed" type="checkbox"></div>
+  <div class="toggle"><label>Allow self loops</label><input id="selfLoops" type="checkbox"></div>
+  <div class="groupBtns"><button class="btn" id="rebuildMatrix">Build from topology</button><button class="btn primary" id="applyMatrix">Apply matrix</button></div>
+  <p class="help">Each matrix entry aᵢⱼ is the weight used by robot i for information from robot j. Edit weights directly; zero removes an edge.</p>
+  <h3 style="font-size:.9rem">Python graph program</h3>
+  <textarea id="pythonGraphCode" class="code smallcode" spellcheck="false"># Return neighbors used by robot i as [[j, weight], ...].
+# The graph may be directed, weighted, state-dependent, or switching.
+def graph_neighbors(robot_id, world, params):
+    out = []
+    radius = float(params.get("graph_radius", 260.0))
+    xi, yi = world[robot_id]["position"]
+    for r in world:
+        j = r["id"]
+        if j == robot_id:
+            continue
+        xj, yj = r["position"]
+        d = ((xi-xj)**2 + (yi-yj)**2)**0.5
+        if d <= radius:
+            out.append([j, 1.0])
+    return out
+</textarea>
+  <div class="groupBtns" style="margin-top:8px"><button class="btn primary" id="loadGraphPython">Load graph program</button><button class="btn" id="testGraphPython">Test graph program</button></div>
+  <div class="statusBox" id="graphPyStatus">Python graph program not loaded.</div>
+</section>
+<section class="codePanel"><h2>Adjacency / weight matrix A</h2><div class="matrixWrap"><table class="matrix" id="matrixTable"></table></div></section>
+</div>
+</section>
+
+<section class="workspace" id="sensors">
+<section class="codePanel">
+<h2>Robot sensor suite</h2>
+<p class="help">Noise presets are deliberately generic teaching defaults, not manufacturer specifications. Every value is editable.</p>
+<div class="field"><label>Sensor preset</label><select class="select" id="sensorPreset"><option value="custom">Custom / keep current values</option><option value="ideal">Ideal sensors</option><option value="mocap">Motion-capture-like position</option><option value="uwb">UWB-like ranging</option><option value="wifi">Wi-Fi RSSI-heavy</option><option value="radar">Short-range radar-heavy</option></select></div>
+<div style="overflow:auto"><table class="sensorTable">
+<thead><tr><th>Sensor</th><th>Enable</th><th>Noise σ</th><th>Bias σ</th><th>Range</th><th>Dropout</th></tr></thead>
+<tbody>
+<tr><td>Absolute position (x,y)</td><td><input id="sPos" type="checkbox" checked></td><td><input id="posNoise" type="number" value="2.0" step=".1"></td><td><input id="posBias" type="number" value=".5" step=".1"></td><td><input value="∞" disabled></td><td><input id="posDrop" type="number" value="0" step=".01" min="0" max="1"></td></tr>
+<tr><td>Relative distance</td><td><input id="sDist" type="checkbox" checked></td><td><input id="distNoise" type="number" value="1.0" step=".1"></td><td><input id="distBias" type="number" value=".2" step=".1"></td><td><input id="distRange" type="number" value="350"></td><td><input id="distDrop" type="number" value=".02" step=".01" min="0" max="1"></td></tr>
+<tr><td>Bearing</td><td><input id="sBearing" type="checkbox" checked></td><td><input id="bearingNoise" type="number" value="1.5" step=".1"></td><td><input id="bearingBias" type="number" value=".3" step=".1"></td><td><input id="bearingRange" type="number" value="350"></td><td><input id="bearingDrop" type="number" value=".02" step=".01" min="0" max="1"></td></tr>
+<tr><td>RF / RSSI</td><td><input id="sRF" type="checkbox"></td><td><input id="rfNoise" type="number" value="2.5" step=".1"></td><td><input id="rfBias" type="number" value="1.0" step=".1"></td><td><input id="rfRange" type="number" value="500"></td><td><input id="rfDrop" type="number" value=".05" step=".01" min="0" max="1"></td></tr>
+<tr><td>Radar range+bearing</td><td><input id="sRadar" type="checkbox"></td><td><input id="radarNoise" type="number" value=".8" step=".1"></td><td><input id="radarBias" type="number" value=".2" step=".1"></td><td><input id="radarRange" type="number" value="450"></td><td><input id="radarDrop" type="number" value=".03" step=".01" min="0" max="1"></td></tr>
+</tbody></table></div>
+<div class="sensorExplain">
+<div><b>Position</b><p>Additive Gaussian error on x and y plus a per-run random bias.</p></div>
+<div><b>Distance</b><p>Additive Gaussian range error; measurements disappear beyond sensing range.</p></div>
+<div><b>Bearing</b><p>Gaussian angular error in degrees, converted internally to radians.</p></div>
+<div><b>RF / RSSI</b><p>Log-distance path-loss model with Gaussian shadowing: RSSI = P₀ − 10n log₁₀(d/d₀) + noise.</p></div>
+<div><b>Radar</b><p>Range + bearing measurement with configurable noise and finite detection range.</p></div>
+<div><b>Dropout</b><p>Independent Bernoulli packet/measurement loss per observation, useful for robustness exercises.</p></div>
+</div>
+<div class="grid2" style="margin-top:12px"><div><div class="field"><label>RF P₀ at d₀=1</label><input class="num" id="rfP0" type="number" value="-40"></div><div class="field"><label>RF path-loss exponent n</label><input class="num" id="rfN" type="number" value="2.2" step=".1"></div></div><div><div class="field"><label>Sensor update divider</label><input class="num" id="sensorDivider" type="number" value="1" min="1" max="20"></div><p class="help">Set to 1 for every control step, 2 for half-rate sensing, etc. Measurements are held between sensor updates.</p></div></div>
+<div class="grid2" style="margin-top:12px">
+<div>
+<h3 style="font-size:.9rem">Per-robot sensor overrides</h3>
+<textarea id="sensorOverrides" class="code smallcode" spellcheck="false">{
+  "0": {"pos": {"noise": 0.5}},
+  "2": {"rf": {"on": true, "noise": 4.0}}
+}</textarea>
+<p class="help">Keys are zero-based robot IDs. Override <code>on</code>, <code>noise</code>, <code>bias</code>, <code>range</code>, or <code>drop</code> for any sensor.</p>
+</div>
+<div>
+<h3 style="font-size:.9rem">Python observation post-processor</h3>
+<textarea id="pythonSensorCode" class="code smallcode" spellcheck="false"># Modify the built-in noisy observation before the controller sees it.
+# Examples: quantization, filtering, custom dropout, fusion, attacks.
+def sensor_filter(robot_id, observation, params):
+    return observation
+</textarea>
+<div class="groupBtns" style="margin-top:8px"><button class="btn primary" id="loadSensorPython">Load sensor_filter()</button><button class="btn" id="testSensorPython">Test sensor hook</button></div>
+<div class="statusBox" id="sensorPyStatus">Python sensor hook not loaded.</div>
+</div>
+</div>
+</section>
+</section>
+
+
+<section class="workspace" id="safety">
+<div class="grid2">
+<section class="codePanel">
+<h2>Control Barrier Function safety layer</h2>
+<p class="help">The safety layer runs <b>after</b> the nominal controller. It minimally modifies each command to satisfy configured safety inequalities where possible.</p>
+<div class="toggle"><label>Enable CBF safety filter</label><input id="cbfEnable" type="checkbox" checked></div>
+<div class="toggle"><label>Pairwise collision CBF</label><input id="cbfCollision" type="checkbox" checked></div>
+<div class="toggle"><label>Workspace boundary CBF</label><input id="cbfBoundary" type="checkbox" checked></div>
+<div class="toggle"><label>Visualize active safety constraints</label><input id="showCBF" type="checkbox" checked></div>
+<div class="field"><label>Minimum robot separation d<sub>safe</sub></label><div class="row"><input id="cbfDist" type="range" min="24" max="140" step="2" value="52"><span class="value" id="cbfDistVal">52</span></div></div>
+<div class="field"><label>Boundary margin</label><div class="row"><input id="cbfMargin" type="range" min="10" max="120" step="2" value="30"><span class="value" id="cbfMarginVal">30</span></div></div>
+<div class="field"><label>CBF gain α</label><div class="row"><input id="cbfAlpha" type="range" min=".1" max="8" step=".1" value="2.0"><span class="value" id="cbfAlphaVal">2.0</span></div></div>
+<div class="field"><label>Safety projection iterations</label><input class="num" id="cbfIters" type="number" min="1" max="20" value="5"></div>
+<div class="field"><label>CBF relaxation ε</label><input class="num" id="cbfRelax" type="number" min="0" step=".1" value="0"></div>
+<p class="help">For single-integrator collision safety, the filter uses \(h_{ij}=\|p_i-p_j\|^2-d_{safe}^2\) and enforces \(\dot h_{ij}+\alpha h_{ij}\ge 0\). The implementation uses repeated half-space projections as a lightweight browser alternative to a full QP solver.</p>
+</section>
+
+<section class="codePanel">
+<h2>Programmable Python safety filter</h2>
+<textarea id="pythonSafetyCode" class="code smallcode" spellcheck="false"># Optional second-stage safety hook.
+# Called after the built-in CBF filter when enabled.
+#
+# def safety_filter(robot_id, state, nominal_u, params):
+#     return [safe_ux, safe_uy]
+
+def safety_filter(robot_id, state, nominal_u, params):
+    return nominal_u
+</textarea>
+<div class="groupBtns" style="margin-top:8px">
+<button class="btn primary" id="loadSafetyPython">Load safety_filter()</button>
+<button class="btn" id="testSafetyPython">Test safety hook</button>
+</div>
+<div class="statusBox" id="cbfStatus">Built-in CBF layer active. Python safety hook not loaded.</div>
+<h3 style="font-size:.9rem">Execution order</h3>
+<div class="statusBox">1. Sensors / observations
+2. Nominal controller
+3. Built-in CBF safety filter
+4. Optional Python safety_filter()
+5. Speed saturation
+6. Robot dynamics</div>
+<p class="help">This separation lets students compare <b>task control</b> and <b>safety enforcement</b> without embedding collision logic inside every controller.</p>
+</section>
+</div>
+</section>
+
+
+<section class="workspace" id="scenario">
+<div class="grid2">
+<section class="codePanel">
+<h2>Scenario configuration</h2>
+<p class="help">Save or restore a complete experiment: robot initial state, graph, Python programs, parameters, sensors, and CBF settings.</p>
+<div class="groupBtns"><button class="btn primary" id="exportScenario">Generate JSON</button><button class="btn" id="downloadScenario">Download JSON</button><button class="btn" id="applyScenario">Apply JSON</button></div>
+<textarea id="scenarioJSON" class="code" spellcheck="false" placeholder="Scenario JSON appears here..."></textarea>
+<div class="statusBox" id="scenarioStatus">No scenario exported yet.</div>
+</section>
+<section class="codePanel">
+<h2>Programmability pipeline</h2>
+<div class="statusBox">GRAPH
+graph_neighbors(robot_id, world, params)
+  -> [[neighbor_id, weight], ...]
+
+SENSING
+sensor_filter(robot_id, observation, params)
+  -> observation
+
+CONTROL
+control(robot_id, observations, params)
+  -> [ux, uy]
+
+SAFETY
+safety_filter(robot_id, state, nominal_u, params)
+  -> [ux, uy]</div>
+<p class="help">Execution order: dynamic graph → built-in sensor models → optional Python sensor model → nominal controller → CBF → optional Python safety layer → robot dynamics.</p>
+<h3 style="font-size:.9rem">Suggested class use</h3>
+<ol class="help"><li>Export a baseline scenario.</li><li>Give every team identical JSON.</li><li>Students modify one hook or parameter family.</li><li>Compare behavior under identical initial states.</li></ol>
+</section>
+</div>
+</section>
+
+<footer class="footer">Static GitHub Pages application · optional in-browser Python via Pyodide · educational model, not production robot-control software</footer>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id); const sim=$('sim'),ctx=sim.getContext('2d'),err=$('errChart'),ectx=err.getContext('2d'),st=$('stateChart'),sctx=st.getContext('2d');
+let robots=[],offsets=[],A=[],running=false,last=performance.now(),acc=0,history=[],selected=-1,simTime=0,stepCounter=0,lastSensorCount=0,pythonReady=false,pyControl=null,pySafety=null,pyGraph=null,pySensor=null,pythonSafetyReady=false,pythonGraphReady=false,pythonSensorReady=false,pythonGraphMatrix=null,sensorCache=[],pyodide=null,seed=1234567,biases={},activeCBF=[];
+const colors={robot:'#77a9ff',desired:'#8ce2c0',leader:'#ffd274',edge:'#7187b0',sensor:'rgba(215,164,255,.28)',text:'#eef4ff',muted:'#9eacc7'};
+const presetPython={
+consensus:`# Average/rendezvous consensus using noisy relative position when available.
+def control(robot_id, observations, params):
+    k = float(params.get("k_position", 1.0))
+    ux = uy = 0.0
+    for n in observations["neighbors"]:
+        rp = n.get("relative_position")
+        if rp is not None:
+            ux += k * rp[0]
+            uy += k * rp[1]
+    return [ux, uy]
+`,
+formation:`# Offset-based formation control.
+# relative_position is measured neighbor_position - self_position.
+def control(robot_id, observations, params):
+    k = float(params.get("k_position", 1.0))
+    di = observations["desired_offset"]
+    ux = uy = 0.0
+    for n in observations["neighbors"]:
+        rp = n.get("relative_position")
+        dj = n.get("desired_offset")
+        if rp is None or dj is None:
+            continue
+        desired_rel = [dj[0]-di[0], dj[1]-di[1]]
+        ux += k * (rp[0] - desired_rel[0])
+        uy += k * (rp[1] - desired_rel[1])
+    return [ux, uy]
+`,
+leader:`# Leader-follower formation: robot 0 is manually commanded/pinned.
+def control(robot_id, observations, params):
+    if observations.get("leader", False):
+        return [0.0, 0.0]
+    k = float(params.get("k_position", 1.0))
+    di = observations["desired_offset"]
+    ux = uy = 0.0
+    for n in observations["neighbors"]:
+        rp = n.get("relative_position")
+        dj = n.get("desired_offset")
+        if rp is None or dj is None:
+            continue
+        ux += k * (rp[0] - (dj[0]-di[0]))
+        uy += k * (rp[1] - (dj[1]-di[1]))
+    return [ux, uy]
+`,
+sensor:`# Sensor-aware controller: reconstruct relative position from distance+bearing
+# when direct relative position is unavailable.
+import math
+def control(robot_id, observations, params):
+    k = float(params.get("k_position", 1.0))
+    di = observations["desired_offset"]
+    ux = uy = 0.0
+    for n in observations["neighbors"]:
+        rp = n.get("relative_position")
+        if rp is None and n.get("distance") is not None and n.get("bearing") is not None:
+            rp = [n["distance"]*math.cos(n["bearing"]), n["distance"]*math.sin(n["bearing"])]
+        if rp is None:
+            continue
+        dj = n["desired_offset"]
+        ux += k * (rp[0] - (dj[0]-di[0]))
+        uy += k * (rp[1] - (dj[1]-di[1]))
+    return [ux, uy]
+`};
+$('pythonCode').value=presetPython.formation;
+
+function rng(){seed=(1664525*seed+1013904223)>>>0;return seed/4294967296} function gauss(){let u=0,v=0;while(!u)u=rng();while(!v)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))} function num(id,def=0){let v=parseFloat($(id).value);return Number.isFinite(v)?v:def}
+function size(){const d=Math.min(devicePixelRatio||1,2),r=sim.getBoundingClientRect(),w=Math.max(320,r.width),h=w*9/16;sim.width=Math.round(w*d);sim.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);return{w,h,d}}
+function makeOffsets(){const n=robots.length,s=num('spacing',70),shape=$('formation').value,d=[];if(shape==='circle'){let r=Math.max(s,12*n);for(let i=0;i<n;i++){let a=2*Math.PI*i/n-Math.PI/2;d.push({x:r*Math.cos(a),y:r*Math.sin(a)})}}else if(shape==='line'){for(let i=0;i<n;i++)d.push({x:(i-(n-1)/2)*s,y:0})}else if(shape==='v'){d.push({x:0,y:-s});for(let i=1;i<n;i++){let q=Math.ceil(i/2),side=i%2?-1:1;d.push({x:side*q*s*.75,y:-s+q*s*.7})}}else if(shape==='grid'){let c=Math.ceil(Math.sqrt(n)),rows=Math.ceil(n/c);for(let i=0;i<n;i++)d.push({x:(i%c-(c-1)/2)*s,y:(Math.floor(i/c)-(rows-1)/2)*s})}else{for(let i=0;i<n;i++){let a=2*Math.PI*i/n;d.push({x:1.2*s*Math.cos(a)+.35*s*Math.sin(2*a),y:.8*s*Math.sin(a)})}}let mx=d.reduce((q,p)=>q+p.x,0)/n,my=d.reduce((q,p)=>q+p.y,0)/n;d.forEach(p=>{p.x-=mx;p.y-=my});offsets=d}
+function init(){seed=1234567;biases={};history=[];simTime=0;stepCounter=0;let {w,h}=size(),n=+($('count').value);robots=[];for(let i=0;i<n;i++)robots.push({x:w*(.16+.68*rng()),y:h*(.17+.66*rng()),vx:0,vy:0,trail:[]});makeOffsets();buildMatrixFromTopology();renderMatrix();render()}
+function buildMatrixFromTopology(){let n=robots.length,t=$('topology').value,dir=$('directed').checked,self=$('selfLoops').checked;A=Array.from({length:n},()=>Array(n).fill(0));const add=(i,j,w=1)=>{A[i][j]=w;if(!dir)A[j][i]=w};if(t==='complete')for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)add(i,j);else if(t==='ring')for(let i=0;i<n;i++)add(i,(i+1)%n);else if(t==='line')for(let i=0;i<n-1;i++)add(i,i+1);else if(t==='star')for(let i=1;i<n;i++)add(i,0);else if(t==='radius'){let R=num('commRadius',270);for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(Math.hypot(robots[i].x-robots[j].x,robots[i].y-robots[j].y)<=R)add(i,j)}else if((t==='custom'||t==='python')&&A.length===n){}if(self)for(let i=0;i<n;i++)A[i][i]=1}
+function activeA(){if($('topology').value==='python'&&pythonGraphMatrix)return pythonGraphMatrix;if($('topology').value==='radius')buildMatrixFromTopology();return A}
+function renderMatrix(){const t=$('matrixTable');t.innerHTML='';let n=robots.length,head=document.createElement('tr');head.innerHTML='<th>i\\j</th>'+Array.from({length:n},(_,j)=>`<th>${j+1}</th>`).join('');t.appendChild(head);for(let i=0;i<n;i++){let tr=document.createElement('tr');tr.innerHTML=`<th>${i+1}</th>`;for(let j=0;j<n;j++){let td=document.createElement('td'),inp=document.createElement('input');inp.type='number';inp.step='0.1';inp.value=(A[i]?.[j]??0);inp.dataset.i=i;inp.dataset.j=j;td.appendChild(inp);tr.appendChild(td)}t.appendChild(tr)}}
+function applyMatrix(){let n=robots.length,M=Array.from({length:n},()=>Array(n).fill(0));$('matrixTable').querySelectorAll('input').forEach(inp=>{M[+inp.dataset.i][+inp.dataset.j]=parseFloat(inp.value)||0});A=M;$('topology').value='custom';render()}
+function sensorCfg(){return{pos:{on:$('sPos').checked,noise:num('posNoise',2),bias:num('posBias',.5),drop:num('posDrop',0)},dist:{on:$('sDist').checked,noise:num('distNoise',1),bias:num('distBias',.2),range:num('distRange',350),drop:num('distDrop',.02)},bearing:{on:$('sBearing').checked,noise:num('bearingNoise',1.5)*Math.PI/180,bias:num('bearingBias',.3)*Math.PI/180,range:num('bearingRange',350),drop:num('bearingDrop',.02)},rf:{on:$('sRF').checked,noise:num('rfNoise',2.5),bias:num('rfBias',1),range:num('rfRange',500),drop:num('rfDrop',.05),p0:num('rfP0',-40),n:num('rfN',2.2)},radar:{on:$('sRadar').checked,noise:num('radarNoise',.8),bias:num('radarBias',.2),range:num('radarRange',450),drop:num('radarDrop',.03)}}}
+function bias(key,sigma){if(!(key in biases))biases[key]=gauss()*sigma;return biases[key]}
+function drop(p){return rng()<clamp(p,0,1)}
+function robotSensorCfg(i){let base=sensorCfg(),ov={};try{ov=JSON.parse($('sensorOverrides').value||'{}')[String(i)]||{}}catch(e){}for(const k of Object.keys(ov)){if(base[k]&&typeof ov[k]==='object')base[k]=Object.assign({},base[k],ov[k])}return base}
+function observe(i,dt){const cfg=robotSensorCfg(i),r=robots[i],neighbors=[],M=activeA();let self={id:i,velocity:[r.vx,r.vy]};if(cfg.pos.on&&!drop(cfg.pos.drop))self.position=[r.x+gauss()*cfg.pos.noise+bias(`p${i}x`,cfg.pos.bias),r.y+gauss()*cfg.pos.noise+bias(`p${i}y`,cfg.pos.bias)];else self.position=null;
+for(let j=0;j<robots.length;j++){if(i===j||!M[i]?.[j])continue;let q=robots[j],dx=q.x-r.x,dy=q.y-r.y,d=Math.hypot(dx,dy),b=Math.atan2(dy,dx),o={id:j,weight:M[i][j],desired_offset:[offsets[j].x,offsets[j].y]};
+if(cfg.pos.on&&!drop(cfg.pos.drop)){let sx=self.position?self.position[0]:r.x,sy=self.position?self.position[1]:r.y;o.relative_position=[q.x+gauss()*cfg.pos.noise+bias(`p${j}x`,cfg.pos.bias)-sx,q.y+gauss()*cfg.pos.noise+bias(`p${j}y`,cfg.pos.bias)-sy]}else o.relative_position=null;
+o.distance=cfg.dist.on&&d<=cfg.dist.range&&!drop(cfg.dist.drop)?d+gauss()*cfg.dist.noise+bias(`d${i}_${j}`,cfg.dist.bias):null;
+o.bearing=cfg.bearing.on&&d<=cfg.bearing.range&&!drop(cfg.bearing.drop)?b+gauss()*cfg.bearing.noise+bias(`b${i}_${j}`,cfg.bearing.bias):null;
+o.rf_rssi=cfg.rf.on&&d<=cfg.rf.range&&!drop(cfg.rf.drop)?cfg.rf.p0-10*cfg.rf.n*Math.log10(Math.max(d,1))+gauss()*cfg.rf.noise+bias(`rf${i}_${j}`,cfg.rf.bias):null;
+o.radar=cfg.radar.on&&d<=cfg.radar.range&&!drop(cfg.radar.drop)?{range:d+gauss()*cfg.radar.noise+bias(`rr${i}_${j}`,cfg.radar.bias),bearing:b+gauss()*(cfg.radar.noise*.35*Math.PI/180)+bias(`rb${i}_${j}`,cfg.radar.bias*.2*Math.PI/180)}:null;
+neighbors.push(o)}
+return{self,neighbors,desired_offset:[offsets[i].x,offsets[i].y],leader:i===0,dt};}
+function parseTyped(type,value){if(type==='number'){let v=parseFloat(value);return Number.isFinite(v)?v:0}if(type==='boolean')return String(value).toLowerCase()==='true'||value==='1';if(type==='json'){try{return JSON.parse(value)}catch(e){return null}}return value}
+function tableParams(){const out={};document.querySelectorAll('#paramTable tbody tr').forEach(tr=>{const k=tr.querySelector('.pkey')?.value.trim();if(!k)return;const type=tr.querySelector('.ptype')?.value||'number';const val=tr.querySelector('.pval')?.value??'';out[k]=parseTyped(type,val)});return out}
+function escAttr(v){return String(v).replaceAll('&','&amp;').replaceAll('"','&quot;')}
+function addParamRow(k='',type='number',v=''){const tb=$('paramTable').querySelector('tbody'),tr=document.createElement('tr');tr.innerHTML=`<td><input class="pkey" value="${escAttr(k)}"></td><td><select class="ptype"><option value="number">number</option><option value="boolean">boolean</option><option value="string">string</option><option value="json">json</option></select></td><td><input class="pval" value="${escAttr(v)}"></td><td><button class="btn premove" type="button">×</button></td>`;tr.querySelector('.ptype').value=type;tr.querySelector('.premove').onclick=()=>tr.remove();tb.appendChild(tr)}
+function resetParamRows(){const tb=$('paramTable').querySelector('tbody');tb.innerHTML='';addParamRow('graph_radius','number','260');addParamRow('leader_gain','number','1.0');addParamRow('avoid_gain','number','1.8')}
+function params(){let extra={};try{extra=JSON.parse($('customParams').value||'{}')}catch(e){}return Object.assign({k_position:num('kp',1.2),k_velocity:num('kv',.8),max_speed:num('maxSpeed',100),dynamics:$('dynamics').value},tableParams(),extra)}
+function jsControl(i,obs,p){let ux=0,uy=0,di=obs.desired_offset;for(const n of obs.neighbors){let rp=n.relative_position;if(!rp&&n.distance!=null&&n.bearing!=null)rp=[n.distance*Math.cos(n.bearing),n.distance*Math.sin(n.bearing)];if(!rp)continue;let dj=n.desired_offset,w=n.weight??1;ux+=p.k_position*w*(rp[0]-(dj[0]-di[0]));uy+=p.k_position*w*(rp[1]-(dj[1]-di[1]))}if($('dynamics').value==='double'){ux-=p.k_velocity*robots[i].vx;uy-=p.k_velocity*robots[i].vy}return[ux,uy]}
+
+function worldState(){return robots.map((r,i)=>({id:i,position:[r.x,r.y],velocity:[r.vx,r.vy],desired_offset:[offsets[i].x,offsets[i].y]}))}
+async function updatePythonGraph(p){if($('topology').value!=='python'||!pythonGraphReady||!pyGraph){pythonGraphMatrix=null;return}const n=robots.length,M=Array.from({length:n},()=>Array(n).fill(0)),world=worldState();for(let i=0;i<n;i++){try{let v=pyGraph(i,world,p);if(v&&v.toJs)v=v.toJs();for(const pair of v||[]){const j=Number(pair[0]),w=Number(pair[1]);if(Number.isInteger(j)&&j>=0&&j<n&&j!==i&&Number.isFinite(w))M[i][j]=w}}catch(e){$('graphPyStatus').textContent='Graph runtime error: '+e}}pythonGraphMatrix=M}
+async function applyPythonSensors(observations,p){if(!pythonSensorReady||!pySensor)return observations;const out=[];for(let i=0;i<observations.length;i++){try{let v=pySensor(i,observations[i],p);if(v&&v.toJs)v=v.toJs({dict_converter:Object.fromEntries});out.push(v)}catch(e){$('sensorPyStatus').textContent='Sensor runtime error: '+e;out.push(observations[i])}}return out}
+function projectHalfspace(u,a,b){
+  // Project vector u onto a·u >= b.
+  const aa=a[0]*a[0]+a[1]*a[1];
+  if(aa<1e-12) return u;
+  const val=a[0]*u[0]+a[1]*u[1];
+  if(val>=b) return u;
+  const lam=(b-val)/aa;
+  return [u[0]+lam*a[0],u[1]+lam*a[1]];
+}
+function builtInCBF(U,dt){
+  activeCBF=[];
+  if(!$('cbfEnable') || !$('cbfEnable').checked) return U.map(u=>[u[0],u[1]]);
+  const safe=U.map(u=>[u[0],u[1]]);
+  const alpha=num('cbfAlpha',2), dSafe=num('cbfDist',52), margin=num('cbfMargin',30), relax=num('cbfRelax',0);
+  const iters=Math.max(1,Math.min(20,Math.floor(num('cbfIters',5))));
+  const {w,h}=size();
+
+  // Repeated projections approximate the minimum-change QP:
+  // min ||u-u_nom||^2 subject to all CBF halfspaces.
+  for(let it=0;it<iters;it++){
+    if($('cbfCollision').checked){
+      for(let i=0;i<robots.length;i++) for(let j=i+1;j<robots.length;j++){
+        const dx=robots[i].x-robots[j].x, dy=robots[i].y-robots[j].y;
+        const hval=dx*dx+dy*dy-dSafe*dSafe;
+        // 2(p_i-p_j)^T (u_i-u_j) + alpha*h >= -relax
+        const rel=[safe[i][0]-safe[j][0],safe[i][1]-safe[j][1]];
+        const a=[2*dx,2*dy], b=-alpha*hval-relax;
+        const current=a[0]*rel[0]+a[1]*rel[1];
+        if(current<b){
+          // Symmetric correction: split the projection between the two agents.
+          const aa=a[0]*a[0]+a[1]*a[1];
+          if(aa>1e-12){
+            const lam=(b-current)/(2*aa);
+            safe[i][0]+=lam*a[0]; safe[i][1]+=lam*a[1];
+            safe[j][0]-=lam*a[0]; safe[j][1]-=lam*a[1];
+            if(it===iters-1) activeCBF.push({type:'pair',i,j});
+          }
+        }
+      }
+    }
+    if($('cbfBoundary').checked){
+      for(let i=0;i<robots.length;i++){
+        const r=robots[i];
+        // Left: h=x-margin, u_x + alpha h >= 0
+        let b=-alpha*(r.x-margin)-relax, before=safe[i][0]; safe[i]=projectHalfspace(safe[i],[1,0],b);
+        if(it===iters-1 && safe[i][0]!==before)activeCBF.push({type:'bound',i,side:'L'});
+        // Right: h=(w-margin)-x, -u_x + alpha h >= 0
+        b=-alpha*((w-margin)-r.x)-relax; before=safe[i][0]; safe[i]=projectHalfspace(safe[i],[-1,0],b);
+        if(it===iters-1 && safe[i][0]!==before)activeCBF.push({type:'bound',i,side:'R'});
+        // Top
+        b=-alpha*(r.y-margin)-relax; let by=safe[i][1]; safe[i]=projectHalfspace(safe[i],[0,1],b);
+        if(it===iters-1 && safe[i][1]!==by)activeCBF.push({type:'bound',i,side:'T'});
+        // Bottom
+        b=-alpha*((h-margin)-r.y)-relax; by=safe[i][1]; safe[i]=projectHalfspace(safe[i],[0,-1],b);
+        if(it===iters-1 && safe[i][1]!==by)activeCBF.push({type:'bound',i,side:'B'});
+      }
+    }
+  }
+  return safe;
+}
+async function applyPythonSafety(U,p){
+  if(!pythonSafetyReady||!pySafety) return U;
+  const out=[];
+  for(let i=0;i<robots.length;i++){
+    const state={id:i,position:[robots[i].x,robots[i].y],velocity:[robots[i].vx,robots[i].vy],all_positions:robots.map(r=>[r.x,r.y]),dt:1/Math.max(5,num('rate',30))};
+    try{
+      let v=pySafety(i,state,U[i],p);
+      if(v&&v.toJs)v=v.toJs();
+      out.push([Number(v[0])||0,Number(v[1])||0]);
+      if(v&&v.destroy)v.destroy();
+    }catch(e){$('cbfStatus').textContent='Python safety runtime error: '+e;out.push(U[i])}
+  }
+  return out;
+}
+
+async function computeControls(observations,p){if($('usePython').checked&&pythonReady&&pyControl){let out=[];for(let i=0;i<robots.length;i++){try{let v=pyControl(i,observations[i],p);if(v&&v.toJs)v=v.toJs();out.push([Number(v[0])||0,Number(v[1])||0]);if(v&&v.destroy)v.destroy()}catch(e){$('pyStatus').textContent='Runtime error: '+e;out.push([0,0])}}return out}return observations.map((o,i)=>jsControl(i,o,p))}
+async function step(dt){stepCounter++;let divider=Math.max(1,Math.floor(num('sensorDivider',1)));let p=params();await updatePythonGraph(p);if(sensorCache.length!==robots.length||stepCounter%divider===1||divider===1){sensorCache=robots.map((_,i)=>observe(i,dt));sensorCache=await applyPythonSensors(sensorCache,p)}let obs=sensorCache;lastSensorCount=obs.reduce((s,o)=>s+(o&&o.neighbors?o.neighbors.length:0),0);let U=await computeControls(obs,p);U=builtInCBF(U,dt);U=await applyPythonSafety(U,p);let maxV=num('maxSpeed',100),{w,h}=size();
+for(let i=0;i<robots.length;i++){let r=robots[i],u=U[i]||[0,0];if(i===0&&presetMode()==='leader'){r.vx*=.8;r.vy*=.8;continue}if($('dynamics').value==='double'){r.vx+=u[0]*dt;r.vy+=u[1]*dt}else{r.vx=u[0];r.vy=u[1]}let sp=Math.hypot(r.vx,r.vy);if(sp>maxV){r.vx*=maxV/sp;r.vy*=maxV/sp}r.x=clamp(r.x+r.vx*dt,18,w-18);r.y=clamp(r.y+r.vy*dt,18,h-18);if($('showTrails').checked){r.trail.push({x:r.x,y:r.y});if(r.trail.length>100)r.trail.shift()}else r.trail=[]}
+simTime+=dt;if(history.length===0||simTime-history[history.length-1].t>.12)record()}
+function presetMode(){let c=$('pythonCode').value;if(c.includes('leader',0)&&c.includes('observations.get("leader"'))return'leader';return'formation'}
+function metrics(){let n=robots.length,cx=robots.reduce((s,r)=>s+r.x,0)/n,cy=robots.reduce((s,r)=>s+r.y,0)/n,spread=Math.sqrt(robots.reduce((s,r)=>s+(r.x-cx)**2+(r.y-cy)**2,0)/n);let bx=robots[0].x-offsets[0].x,by=robots[0].y-offsets[0].y,f=0;for(let i=0;i<n;i++)f+=(robots[i].x-(bx+offsets[i].x))**2+(robots[i].y-(by+offsets[i].y))**2;return{spread,f:Math.sqrt(f/n)}}
+function record(){let m=metrics();history.push({t:simTime,s:m.spread,f:m.f,x:robots.map(r=>r.x)});if(history.length>240)history.shift()}
+function draw(){let {w,h}=size();ctx.clearRect(0,0,w,h);ctx.strokeStyle='rgba(255,255,255,.035)';ctx.lineWidth=1;for(let x=0;x<w;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=0;y<h;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+if($('showTrails').checked){for(const r of robots){if(r.trail.length<2)continue;ctx.strokeStyle='rgba(119,169,255,.22)';ctx.beginPath();r.trail.forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke()}}
+let M=activeA();if($('showGraph').checked)for(let i=0;i<robots.length;i++)for(let j=0;j<robots.length;j++)if(M[i]?.[j]&&(i<j||$('directed').checked)){let a=robots[i],b=robots[j];ctx.strokeStyle=colors.edge;ctx.lineWidth=Math.max(.8,Math.min(3,Math.abs(M[i][j])));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+if($('showSensors').checked){let cfg=sensorCfg();for(let i=0;i<robots.length;i++)for(let j=i+1;j<robots.length;j++){let d=Math.hypot(robots[i].x-robots[j].x,robots[i].y-robots[j].y);if((cfg.dist.on&&d<cfg.dist.range)||(cfg.bearing.on&&d<cfg.bearing.range)||(cfg.rf.on&&d<cfg.rf.range)||(cfg.radar.on&&d<cfg.radar.range)){ctx.strokeStyle=colors.sensor;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(robots[i].x,robots[i].y);ctx.lineTo(robots[j].x,robots[j].y);ctx.stroke();ctx.setLineDash([])}}}
+
+if($('showCBF') && $('showCBF').checked && activeCBF.length){
+  ctx.save();ctx.strokeStyle='#ff8585';ctx.fillStyle='#ff8585';ctx.lineWidth=3;
+  for(const c of activeCBF){
+    if(c.type==='pair'){
+      const a=robots[c.i],b=robots[c.j];
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;ctx.font='11px system-ui';ctx.fillText('CBF',mx+5,my-5);
+    }else if(c.type==='bound'){
+      const r=robots[c.i];ctx.beginPath();ctx.arc(r.x,r.y,20,0,Math.PI*2);ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+if($('showDesired').checked){let bx=robots[0].x-offsets[0].x,by=robots[0].y-offsets[0].y;for(let i=0;i<robots.length;i++){ctx.strokeStyle=colors.desired;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(bx+offsets[i].x,by+offsets[i].y,10,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}}
+robots.forEach((r,i)=>{ctx.fillStyle=i===0&&presetMode()==='leader'?colors.leader:colors.robot;ctx.beginPath();ctx.arc(r.x,r.y,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#07101d';ctx.beginPath();ctx.arc(r.x+5,r.y-3,3,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.text;ctx.font='12px system-ui';ctx.fillText(String(i+1),r.x-3,r.y+31)})}
+function chart(c,cx,type){let d=Math.min(devicePixelRatio||1,2),r=c.getBoundingClientRect(),w=r.width,h=Math.max(150,w/2.8);c.width=w*d;c.height=h*d;cx.setTransform(d,0,0,d,0,0);cx.clearRect(0,0,w,h);let p={l:38,r:8,t:12,b:22};cx.strokeStyle='#2b3a59';cx.strokeRect(p.l,p.t,w-p.l-p.r,h-p.t-p.b);if(history.length<2)return;let a=history.map(z=>type==='err'?z.s:z.x[0]),b=history.map(z=>type==='err'?z.f:(z.x[1]??z.x[0])),all=a.concat(b),mn=Math.min(...all),mx=Math.max(...all);if(mx-mn<1e-5)mx=mn+1;let X=i=>p.l+i/(history.length-1)*(w-p.l-p.r),Y=v=>p.t+(mx-v)/(mx-mn)*(h-p.t-p.b);for(const [arr,col] of [[a,colors.robot],[b,colors.desired]]){cx.strokeStyle=col;cx.lineWidth=2;cx.beginPath();arr.forEach((v,i)=>i?cx.lineTo(X(i),Y(v)):cx.moveTo(X(i),Y(v)));cx.stroke()}}
+function render(){draw();let m=metrics(),M=activeA(),edges=0;for(let i=0;i<M.length;i++)for(let j=0;j<M.length;j++)if(M[i][j])edges++;if(!$('directed').checked)edges=Math.round(edges/2);$('spread').textContent=m.spread.toFixed(1);$('ferr').textContent=m.f.toFixed(1);$('edgeCount').textContent=edges;$('sensorCount').textContent=lastSensorCount;chart(err,ectx,'err');chart(st,sctx,'state')}
+async function loop(now){let elapsed=Math.min(.05,(now-last)/1000);last=now;if(running){acc+=elapsed;let dt=1/Math.max(5,num('rate',30));while(acc>=dt){await step(dt);acc-=dt}}render();requestAnimationFrame(loop)}
+async function loadPy(){try{$('pyStatus').textContent='Loading Pyodide runtime…';await ensurePyodide();let code=$('pythonCode').value;await pyodide.runPythonAsync(code);pyControl=pyodide.globals.get('control');if(!pyControl)throw new Error('Define function control(robot_id, observations, params).');pythonReady=true;$('usePython').checked=true;$('pyStatus').textContent='Python protocol compiled and active.'}catch(e){pythonReady=false;$('pyStatus').textContent='Compile/load error:\\n'+e}}
+
+async function ensurePyodide(){
+  const base='https://cdn.jsdelivr.net/npm/pyodide@0.27.7/';
+  if(!window.loadPyodide){
+    await new Promise((res,rej)=>{
+      let s=document.createElement('script');
+      s.src=base+'pyodide.js';
+      s.onload=res;
+      s.onerror=()=>rej(new Error('Unable to load Pyodide from '+base));
+      document.head.appendChild(s);
+    });
+  }
+  if(!pyodide)pyodide=await loadPyodide({indexURL:base});
+}
+async function loadSafetyPy(){
+  try{
+    $('cbfStatus').textContent='Loading Python safety hook…';
+    await ensurePyodide();
+    await pyodide.runPythonAsync($('pythonSafetyCode').value);
+    pySafety=pyodide.globals.get('safety_filter');
+    if(!pySafety)throw new Error('Define safety_filter(robot_id, state, nominal_u, params).');
+    pythonSafetyReady=true;
+    $('cbfStatus').textContent='Python safety_filter() compiled and active after the built-in CBF layer.';
+  }catch(e){
+    pythonSafetyReady=false;
+    $('cbfStatus').textContent='Safety hook error:\n'+e;
+  }
+}
+
+async function loadGraphPy(){try{$('graphPyStatus').textContent='Loading Python graph hook…';await ensurePyodide();await pyodide.runPythonAsync($('pythonGraphCode').value);pyGraph=pyodide.globals.get('graph_neighbors');if(!pyGraph)throw new Error('Define graph_neighbors(robot_id, world, params).');pythonGraphReady=true;$('topology').value='python';$('graphPyStatus').textContent='Python graph program compiled and active.';await updatePythonGraph(params());render()}catch(e){pythonGraphReady=false;$('graphPyStatus').textContent='Graph hook error:\n'+e}}
+async function loadSensorPy(){try{$('sensorPyStatus').textContent='Loading Python sensor hook…';await ensurePyodide();await pyodide.runPythonAsync($('pythonSensorCode').value);pySensor=pyodide.globals.get('sensor_filter');if(!pySensor)throw new Error('Define sensor_filter(robot_id, observation, params).');pythonSensorReady=true;sensorCache=[];$('sensorPyStatus').textContent='Python sensor_filter() compiled and active.'}catch(e){pythonSensorReady=false;$('sensorPyStatus').textContent='Sensor hook error:\n'+e}}
+function applySensorPreset(name){const set=(id,v)=>{$(id).value=v};if(name==='custom')return;if(name==='ideal'){['sPos','sDist','sBearing'].forEach(id=>$(id).checked=true);['sRF','sRadar'].forEach(id=>$(id).checked=false);set('posNoise',0);set('posBias',0);set('distNoise',0);set('distBias',0);set('bearingNoise',0);set('bearingBias',0);set('posDrop',0);set('distDrop',0);set('bearingDrop',0)}else if(name==='mocap'){$('sPos').checked=true;set('posNoise',0.5);set('posBias',0.2);set('posDrop',0.005)}else if(name==='uwb'){$('sDist').checked=true;set('distNoise',5);set('distBias',2);set('distRange',450);set('distDrop',0.03)}else if(name==='wifi'){$('sRF').checked=true;set('rfNoise',4);set('rfBias',2);set('rfRange',650);set('rfDrop',0.08);set('rfN',2.4)}else if(name==='radar'){$('sRadar').checked=true;set('radarNoise',1.2);set('radarBias',0.4);set('radarRange',500);set('radarDrop',0.02)}biases={};sensorCache=[];render()}
+function scenarioObject(){const ids=['sPos','posNoise','posBias','posDrop','sDist','distNoise','distBias','distRange','distDrop','sBearing','bearingNoise','bearingBias','bearingRange','bearingDrop','sRF','rfNoise','rfBias','rfRange','rfDrop','sRadar','radarNoise','radarBias','radarRange','radarDrop','rfP0','rfN','sensorDivider'];const sv={};ids.forEach(id=>sv[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);return{version:1,team:{count:+$('count').value,dynamics:$('dynamics').value,formation:$('formation').value,maxSpeed:$('maxSpeed').value,rate:$('rate').value,spacing:$('spacing').value},params:{kp:$('kp').value,kv:$('kv').value,custom:$('customParams').value,table:tableParams()},graph:{topology:$('topology').value,directed:$('directed').checked,selfLoops:$('selfLoops').checked,commRadius:$('commRadius').value,A:A,python:$('pythonGraphCode').value},sensors:{values:sv,overrides:$('sensorOverrides').value,python:$('pythonSensorCode').value},protocol:{python:$('pythonCode').value,usePython:$('usePython').checked},safety:{enabled:$('cbfEnable').checked,collision:$('cbfCollision').checked,boundary:$('cbfBoundary').checked,dist:$('cbfDist').value,margin:$('cbfMargin').value,alpha:$('cbfAlpha').value,iters:$('cbfIters').value,relax:$('cbfRelax').value,python:$('pythonSafetyCode').value},robots:robots.map(r=>({x:r.x,y:r.y,vx:r.vx,vy:r.vy}))}}
+function exportScenario(){const obj=scenarioObject();$('scenarioJSON').value=JSON.stringify(obj,null,2);$('scenarioStatus').textContent='Scenario JSON generated.';return obj}
+function applyScenarioObject(o){if(!o||o.version!==1)throw new Error('Unsupported scenario version');$('count').value=o.team.count;$('countVal').textContent=o.team.count;$('dynamics').value=o.team.dynamics;$('formation').value=o.team.formation;$('maxSpeed').value=o.team.maxSpeed;$('maxSpeedVal').textContent=o.team.maxSpeed;$('rate').value=o.team.rate;$('rateVal').textContent=o.team.rate+' Hz';$('spacing').value=o.team.spacing;$('kp').value=o.params.kp;$('kv').value=o.params.kv;$('customParams').value=o.params.custom||'{}';const tb=$('paramTable').querySelector('tbody');tb.innerHTML='';Object.entries(o.params.table||{}).forEach(([k,v])=>addParamRow(k,typeof v==='number'?'number':typeof v==='boolean'?'boolean':typeof v==='string'?'string':'json',typeof v==='object'?JSON.stringify(v):String(v)));$('topology').value=o.graph.topology;$('directed').checked=!!o.graph.directed;$('selfLoops').checked=!!o.graph.selfLoops;$('commRadius').value=o.graph.commRadius;$('commRadiusVal').textContent=o.graph.commRadius;$('pythonGraphCode').value=o.graph.python||$('pythonGraphCode').value;for(const [id,v] of Object.entries(o.sensors.values||{})){if($(id)){if($(id).type==='checkbox')$(id).checked=!!v;else $(id).value=v}}$('sensorOverrides').value=o.sensors.overrides||'{}';$('pythonSensorCode').value=o.sensors.python||$('pythonSensorCode').value;$('pythonCode').value=o.protocol.python||$('pythonCode').value;$('usePython').checked=!!o.protocol.usePython;$('cbfEnable').checked=!!o.safety.enabled;$('cbfCollision').checked=!!o.safety.collision;$('cbfBoundary').checked=!!o.safety.boundary;$('cbfDist').value=o.safety.dist;$('cbfMargin').value=o.safety.margin;$('cbfAlpha').value=o.safety.alpha;$('cbfIters').value=o.safety.iters;$('cbfRelax').value=o.safety.relax;$('pythonSafetyCode').value=o.safety.python||$('pythonSafetyCode').value;init();if(Array.isArray(o.robots)&&o.robots.length===robots.length)o.robots.forEach((r,i)=>Object.assign(robots[i],r));if(o.graph.topology==='custom'&&o.graph.A){A=o.graph.A;renderMatrix()}sensorCache=[];render()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.workspace').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active');render()}));
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{$('pythonCode').value=presetPython[b.dataset.preset]}));
+$('loadPython').onclick=loadPy;$('testPython').onclick=async()=>{if(!pythonReady)await loadPy();if(pythonReady){let o=observe(0,1/30),p=params();try{let v=pyControl(0,o,p);if(v.toJs)v=v.toJs();$('pyStatus').textContent='Test robot 1 output: '+JSON.stringify(v)}catch(e){$('pyStatus').textContent='Test error: '+e}}};
+
+$('loadSafetyPython').onclick=loadSafetyPy;
+$('testSafetyPython').onclick=async()=>{
+  if(!pythonSafetyReady)await loadSafetyPy();
+  if(pythonSafetyReady){
+    try{
+      let state={id:0,position:[robots[0].x,robots[0].y],velocity:[robots[0].vx,robots[0].vy],all_positions:robots.map(r=>[r.x,r.y]),dt:1/30};
+      let v=pySafety(0,state,[10,-5],params());if(v&&v.toJs)v=v.toJs();
+      $('cbfStatus').textContent='Test safety output: '+JSON.stringify(v);
+    }catch(e){$('cbfStatus').textContent='Test safety error: '+e}
+  }
+};
+['cbfEnable','cbfCollision','cbfBoundary','showCBF'].forEach(id=>$(id).addEventListener('input',render));
+$('cbfDist').addEventListener('input',()=>{$('cbfDistVal').textContent=$('cbfDist').value;render()});
+$('cbfMargin').addEventListener('input',()=>{$('cbfMarginVal').textContent=$('cbfMargin').value;render()});
+$('cbfAlpha').addEventListener('input',()=>{$('cbfAlphaVal').textContent=(+$('cbfAlpha').value).toFixed(1);render()});
+
+$('addParam').onclick=()=>addParamRow('','number','0');$('resetParams').onclick=resetParamRows;
+$('loadGraphPython').onclick=loadGraphPy;$('testGraphPython').onclick=async()=>{if(!pythonGraphReady)await loadGraphPy();if(pythonGraphReady){await updatePythonGraph(params());$('graphPyStatus').textContent='Test produced '+(pythonGraphMatrix?pythonGraphMatrix.flat().filter(x=>x!==0).length:0)+' directed weighted links.';render()}};
+$('loadSensorPython').onclick=loadSensorPy;$('testSensorPython').onclick=async()=>{if(!pythonSensorReady)await loadSensorPy();if(pythonSensorReady){let o=await applyPythonSensors([observe(0,1/30)],params());$('sensorPyStatus').textContent='Test observation:\n'+JSON.stringify(o[0],null,2).slice(0,2500)}};
+$('sensorPreset').addEventListener('input',()=>applySensorPreset($('sensorPreset').value));
+$('sensorOverrides').addEventListener('input',()=>{sensorCache=[]});
+$('exportScenario').onclick=exportScenario;
+$('downloadScenario').onclick=()=>{const obj=exportScenario(),blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='multi_robot_scenario.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('applyScenario').onclick=()=>{try{applyScenarioObject(JSON.parse($('scenarioJSON').value));$('scenarioStatus').textContent='Scenario applied.'}catch(e){$('scenarioStatus').textContent='Scenario error: '+e.message}};
+$('playBtn').onclick=()=>{running=!running;$('playBtn').textContent=running?'❚❚ Pause':'▶ Run';$('simStatus').textContent=running?'Running':'Paused'};$('stepBtn').onclick=async()=>{await step(1/Math.max(5,num('rate',30)));render()};$('resetBtn').onclick=init;$('disturbBtn').onclick=()=>{let s=size();robots.forEach((r,i)=>{r.x=clamp(r.x+(rng()-.5)*140,18,s.w-18);r.y=clamp(r.y+(rng()-.5)*140,18,s.h-18);r.vx+=(rng()-.5)*80;r.vy+=(rng()-.5)*80});render()};
+$('rebuildMatrix').onclick=()=>{buildMatrixFromTopology();renderMatrix();render()};$('applyMatrix').onclick=applyMatrix;
+['formation','spacing'].forEach(id=>$(id).addEventListener('input',()=>{makeOffsets();render()}));['topology','directed','selfLoops','commRadius'].forEach(id=>$(id).addEventListener('input',()=>{if($('topology').value!=='custom'){buildMatrixFromTopology();renderMatrix()}render()}));
+$('count').addEventListener('input',()=>{$('countVal').textContent=$('count').value;init()});$('maxSpeed').addEventListener('input',()=>{$('maxSpeedVal').textContent=$('maxSpeed').value});$('rate').addEventListener('input',()=>{$('rateVal').textContent=$('rate').value+' Hz'});$('commRadius').addEventListener('input',()=>{$('commRadiusVal').textContent=$('commRadius').value});
+['showGraph','showTrails','showSensors','showDesired'].forEach(id=>$(id).addEventListener('input',render));
+function ppos(ev){let r=sim.getBoundingClientRect(),s=size();return{x:(ev.clientX-r.left)*s.w/r.width,y:(ev.clientY-r.top)*s.h/r.height}}
+sim.addEventListener('pointerdown',ev=>{sim.setPointerCapture(ev.pointerId);let p=ppos(ev),best=-1,bd=30;robots.forEach((r,i)=>{let d=Math.hypot(r.x-p.x,r.y-p.y);if(d<bd){bd=d;best=i}});selected=best});sim.addEventListener('pointermove',ev=>{if(selected<0)return;let p=ppos(ev),s=size(),r=robots[selected];r.x=clamp(p.x,18,s.w-18);r.y=clamp(p.y,18,s.h-18);r.vx=r.vy=0;render()});['pointerup','pointercancel'].forEach(e=>sim.addEventListener(e,()=>selected=-1));sim.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('playBtn').click()}});
+window.addEventListener('resize',render);resetParamRows();try{init();requestAnimationFrame(loop);}catch(e){console.error(e);const s=$('simStatus');if(s)s.textContent='Initialization error: '+(e&&e.message?e.message:e);}
+})();
+</script>
+</body></html>
